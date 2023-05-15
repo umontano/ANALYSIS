@@ -58,6 +58,7 @@ has_only_n_integers <- function(checkee_column, number_integers = 5)
 # RETURNS TRUE IF THE COLUMN IS BINARY, FALSE OTHERWISE
 is_binary_factor <- function(binaryee_factor_column)
 {
+        binaryee_factor_column <- binaryee_factor_column[!is.na(binaryee_factor_column)]
     binaryee_factor_column <- as.factor(binaryee_factor_column)
     number_of_levels <- length(levels(binaryee_factor_column))
     return(number_of_levels == 2)

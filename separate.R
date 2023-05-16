@@ -42,15 +42,21 @@ string_labels_from_variable_symbols <- function(var)
 
 
 # CHECKS WHETHER THE MUBERA ARE ALL ONLY INTEGERS BETWEEN ZERO AND N
+# CHECK FOR MEMBERSHIP IN  A ZERO_BASED INTEGER SET
 # TAKES AS INPUT A COLUMN TO CHECK _A VECTOR_ AND THE HIGHEST NUMBER THAT BE CONSIDERED AS CATEGORIC _INTEGER_
 # ITS AIM IS TO HELP TO SELECT COLUMS IN A DATASET THAT ENCODE CATEGORICAL VARIABLES USING INTEGERS
-has_only_n_integers <- function(checkee_column, number_integers = 5)
+has_only_n_integers <- function(checkee_column, number_of_levels = 5){all(checkee_column[!is.na(checkee_column)] %in% 0 : number_of_levels)}
+# THIS IS A VARIATION OF THE ABOVE FUNCTION _ IT COMPUTES THE NUMBER OF LEVLS DIRECTLY INSTEAD OF CHECKING FOR MEMBERSHIP IN A ZERO_BASED INTEGER SET
+has_n_leves_or_less <- function(checkee_column, number_of_levels = 5)length(levels(as.factor(checkee_column))) <= number_of_levels
+#UNUSED OLD
+unused_old_has_only_n_integers <- function(checkee_column, number_of_levels = 5)
 {
-    print(names(checkee_column))
     print(head(checkee_column))
-        set_of_integers <- c(0 : number_integers)
-    print(set_of_integers)
-        all(checkee_column %in% set_of_integers, na.rm = TRUE)
+        set_of_integers <- c(0 : number_of_levels)
+    #print(set_of_integers)
+        #all(checkee_column %in% set_of_integers, na.rm = TRUE)
+    print(length(levels(as.factor(checkee_column))))
+    length(levels(as.factor(checkee_column))) <= number_of_levels
 }
 
 # COMPUTES WHETHER THE SUPPLIED COLUM IS BINARY _ THAT IS _ IS CATEGORICAL WITH ONLY TWO LEVELS
@@ -64,11 +70,21 @@ is_binary_factor <- function(binaryee_factor_column)
     return(number_of_levels == 2)
 }
 
+
+
+
+
+# NEW FUNCTION
+# CHECKS WHETHER THE INPUT VECTOR FALLS IS ANY CLASS THAT CN BE ;INTERPRETED AS CATEGORICAL
+is_any_kind_of_categorical <- function(checkee_column, number_of_levels = 5)
+{has_only_n_integers(checkee_column, number_of_levels = number_of_levels) || is.factor(checkee_column) || is.character(checkee_column)}
+
+
 # SEPARATES A DATASET INTO CATEGORICAL AND NUMERIC VARIABLES
 # EVEN IF THE CATEORICAL VARIABLES ARE ENCODED AS INTEGERS
 # IT INVOKES THE has_only_n_integers FUNCTION
 # TAKES AS INPUT THE DATASET TO SPLIT AND THE HIGHER NUMBER THAT WILL BE CONSIDERED AS CATEGORIC _SUCH NUMBER IS CARRIED TO THE INVIKED FUNCTION
-split_categoric_numeric <- function(splitee_dataset, number_integers = 5)
+split_categoric_numeric <- function(splitee_dataset, number_of_levels = 5)
 {
         if(length(splitee_dataset) < 1)
         {
@@ -78,7 +94,7 @@ split_categoric_numeric <- function(splitee_dataset, number_integers = 5)
         }
         else
         {
-            selector_categorical <- sapply(splitee_dataset, function(x){is.factor(x) || has_only_n_integers(x, number_integers) || is.character(x)})
+            selector_categorical <- sapply(splitee_dataset, is_any_kind_of_categorical, number_of_levels = number_of_levels)
             print(selector_categorical)
             categorical_dataset <- splitee_dataset[, selector_categorical, drop = FALSE]
 #SOLUION IS TO  CONDIIONALLLY APPLY SELECTIION OF BINARY SET ONLY WHEN THERE ARE MORE THAN ON FACTOR COLUMN
@@ -129,7 +145,7 @@ user_variables_splitter <- function(read_variables = names(mtcars), delimiter_ma
 # I TAKES A FILE VARIABLES.TXT CONTAINING A LIST OF RESPONSE VARIABLES, A SEPARATOR ---- AND A LIST OF RESPONSES
 # TO SEPARATE THE GIVEN DATASETS,IN ADDITION THE RESULTIND DATASETS ARE FURTHER SEPAEATED INTO BINARY CATEGORICAL AND NUMERICAL VARIABLES
 # THE OUTPUT I  LIST WINTH THE SEMA NUMBER OF ENTRIES AS THE NUMBER OF DATASETS SUPPIED, EACH LIST ELEMENT IS A LIST CONTAINING THE SEPARATED BINARY CATEGORIC AND NUMERIC DATASETS
-separate_all_input_dataset <- function(variables_file = 'variables.txt', ...)
+separate_all_input_dataset <- function(..., number_of_levels = 5, variables_file = 'variables.txt')
 {
 read_variables <- unlist(readLines(variables_file))
         datasets <- list(...)
@@ -138,7 +154,7 @@ read_variables <- unlist(readLines(variables_file))
                  function(dset){
                         names_vectors <- user_variables_splitter(read_variables)
  print(names_vectors)
-                        responses_predictors_datasets_list <- lapply(names_vectors, function(each_nv){split_categoric_numeric(dset[names(dset) %in% each_nv]) })
+                        responses_predictors_datasets_list <- lapply(names_vectors, function(each_nv){split_categoric_numeric(dset[names(dset) %in% each_nv], number_of_levels = number_of_levels)})
 #print(length(responses_predictors_datasets_list))
                         #by_categorical_responses_predictors_datasets_list <- lapply(responses_predictors_datasets_list, function(x){ x <- ifelse(class(x) == 'list', data.frame(unlist(x)), data.frame(x)) })
  #print(by_categorical_responses_predictors_datasets_list)

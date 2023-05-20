@@ -13,11 +13,12 @@ one_by_one_significant_predictors_lm  <- function(one_response, predictors, thre
         function(x)lm(one_response ~ x)
         )
     if(categorical_flag) predictors[] <- lapply(predictors, function(x) as.factor(x))
-	models  <- map(predictors, ~ linear_model(.x))
+    #THIS REFACTURING USES SAPPLY INSTEAD OF MAP
+	models  <- sapply(predictors, linear_model, simplify = FALSE)
     #USE COLUMN Pr>| t or z |) WHICH IS THE FOURTH COLUM IN THE COEFFICIENT MATRIX
-	coeffs  <- map(models, ~ coef(summary(.x))[-1, 4])
-	sig  <- map(coeffs, ~ .x[ .x <= threshold_significance & !is.na(.x) ]  )
-	selector <-  map_lgl(sig, ~length(.x) > 0)
+	coeffs  <- sapply(models, function(x) coef(summary(x))[-1, 4], simplify = FALSE)
+	sig  <- sapply(coeffs, function(x) x[ x <= threshold_significance & !is.na(x) ]  , simplify = FALSE)
+	selector <- sapply(sig, function(x) length(x) > 0)
 	models  <- models[selector]
 	trim <-  sig[selector]
 	return(trim)

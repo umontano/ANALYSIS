@@ -24,8 +24,6 @@ one_by_one_significant_predictors_lm  <- function(one_response, predictors, thre
 	return(trim)
 }
 
-
-
 send_responses_to_predictors_lm <- function(responses_dataset, predictors_dataset, threshold_significance = 0.05, categorical_flag = FALSE, logit_binomial_flag = FALSE)
 {
 	results_predictors_response_one_by_one <- lapply(responses_dataset, one_by_one_significant_predictors_lm, predictors_dataset, threshold_significance = threshold_significance, categorical_flag = categorical_flag, logit_binomial_flag = logit_binomial_flag)
@@ -33,6 +31,66 @@ send_responses_to_predictors_lm <- function(responses_dataset, predictors_datase
 	selector <- sapply(results_predictors_response_one_by_one, function(x) length(x)>0)
 	return(results_predictors_response_one_by_one[selector])
 }
+
+#=================================================================
+# THE FOLLOWING THREE FUNCTIONS IMPLEMENT THE MAPPED LM ANALISES OF TWO DATAFRAMES. THEY ARE SIMILAR TO THE SEND_TO_ AND ONE_BY_ONE_ FUNCTIONS IN MY ORIFINAL CATEGORICA_GLM PACKAGE. THESE NEW FUNTION USE AUTOMATIC DECISION OF MODEL BASED ON THE CONTENET OF THE COLUMNS (FACTORS INTEGER 0 TO N). THE OLD FUNCTION ARE KEPT FOR COMPATIBILITY.
+#=================================================================
+# SELECTS GLM MODEL DEPENDING ON THE CONTENT OF COLUMNS, MULTICAT COLUMNS ARE COLUMN THE CONTAIN ONLY INTEGERS BEYWEEN 0 AND N NUMBER_OF_LEVELS
+linear_model_automatic_selector  <- function(response_column, predictor_column, number_of_levels = number_of_levels)
+{
+        #DECISION ON DEPENDENT VARIABLES
+        #INVERT THE ORDER RESPONSE PREDICTOR IN THE COLUMN IS MUTICAT
+        if(is_multicat_but_not_binary(response_column, number_of_levels = number_of_levels))
+        {
+                temp  <- response_column
+                response_column <- predictor_column
+                predictor_column <- temp
+        }
+
+        #DECISION ON INDEPENDENT VARIABLES
+        if(is_any_kind_of_categorical(predictor_column, number_of_levels = number_of_levels)) predictor_column <- as.factor(predictor_column)
+
+        #DEcISIONS ON WHETHER THE RESPONSE IS BINARY
+        #IF RESPONSE IS BINARY USE LOGISTIC BINOMIAL REGRESSION
+        if(is_binary_factor(response_column))
+        {
+                response_column <- as.factor(response_column)
+                linear_model <- function(y, x)glm(y ~ x, family = 'binomial')
+        }
+        else
+        {
+                response_column <- as.numeric(response_column, drop.unused.levels = FALSE)
+                linear_model <- function(y, x)lm(y ~ x)
+        }
+
+        #RUN MODEL AND EXTRACT THE COEFFICIENTS COLUMN _ COLUMN FOUR _ THE IRST ROW IS REMOVED SINCE SUCH ROW IS NOT RELEVANT
+        pvalues_coefficients_column <- coef(summary(linear_model(response_column, predictor_column)))[-1, 4]
+        return(pvalues_coefficients_column)
+}
+
+#function REGRESSIONS significant values
+analyze_one_response_many_predictors_using_automatic_lm_selector  <- function(one_response, predictors, number_of_levels = number_of_levels, threshold_significance = 0.05)
+{
+    #THIS REFACTURING USES SAPPLY INSTEAD OF MAP
+	coeffs  <- sapply(predictors, function(x)linear_model_automatic_selector(one_response, x, number_of_levels = number_of_levels), simplify = FALSE)
+    #USE COLUMN Pr>| t or z |) WHICH IS THE FOURTH COLUM IN THE COEFFICIENT MATRIX
+	sig  <- sapply(coeffs, function(x) x[ x <= threshold_significance & !is.na(x) ]  , simplify = FALSE)
+	selector <- sapply(sig, function(x) length(x) > 0)
+	sig[selector]
+}
+
+# RUN LM ANALYSES BY MAPPIN MANYREPONSES TO MANY PREDICORS _ TAKES TWO DATAFRAMES AS INPUTS _ RETURNS A LIST WOTH SIGNIFICANT PVALUES
+analyze_many_response_many_predictors_using_automatic_lm_selector <- function(responses_dataset, predictors_dataset, number_of_levels = number_of_levels, threshold_significance = 0.05)
+{
+	results_predictors_response_one_by_one <- sapply(responses_dataset, analyze_one_response_many_predictors_using_automatic_lm_selector, predictors_dataset, number_of_levels = number_of_levels, threshold_significance = threshold_significance, simplify = FALSE)
+    #NOTE THAT ALL THE FUNCTION ARGUMENTS NEED TO BE CARRIED OVER TO THE LAPPLY
+	selector <- sapply(results_predictors_response_one_by_one, function(x) length(x)>0)
+	return(results_predictors_response_one_by_one[selector])
+}
+#=================================================================
+#=================================================================
+#=================================================================
+
 
 merged_categorical_and_torrance_totals <- function(columns_dataset, categorical_names = c('perfil', 'escuela', 'grupo', 'sexo', 'edad', 'percentil', 'rango', 'dx'), sign=0.05)
 {

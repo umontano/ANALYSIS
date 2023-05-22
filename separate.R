@@ -173,3 +173,25 @@ read_variables <- unlist(readLines(variables_file))
         return(all_separated_datasets)
 }
 
+
+#================================================================
+# SEPARATE A DATASET INTO TWO, CONTAINING THE RESPONSES AND PRESICTORS AS SPECIFIED IN THE SPECIFIED FILE, DEFAULT FILE[ variables.txt
+# TAKES A DATAFREME TO SPLIT, A NEE OF FILE (DEFAULT variables.txt). RETURNNS A LIST CONTAINING 1 THE RESPONSES DATAFRAME, AND, 2 THE PREDICTORS DATAFRAME.
+separate_responses_predictors_as_specified_in_variables_file  <- function(glmee_dataset, variables_file = 'variables.txt')
+{
+        read_variables <- unlist(readLines(variables_file))
+        names_vectors <- user_variables_splitter(read_variables)
+        responses_predictors_datasets_list <- lapply(names_vectors, function(each_names_vector)glmee_dataset[names(glmee_dataset) %in% each_names_vector])
+}
+
+#=================================================================
+# GENERAL RUN ANALYSES, USING AUTOMATIC GLM MODEL SELECTION
+#================================================================
+run_autoselected_glm_analyses <- function(glmee_dataset, number_of_levels = number_of_levels, threshold_significance = threshold_significance, variables_file = 'variables.txt')
+{
+        resp_pred <- separate_responses_predictors_as_specified_in_variables_file(glmee_dataset)
+        significants_list  <- analyze_many_response_many_predictors_using_automatic_lm_selector(resp_pred[[1]], resp_pred[[2]], number_of_levels = number_of_levels, threshold_significance = threshold_significance)
+        if(require('yaml')) write_yaml(significants_list, 'xSIGNIFICAT_RESULTS.yaml')
+        significants_list
+}
+

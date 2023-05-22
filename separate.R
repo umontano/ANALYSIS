@@ -74,6 +74,15 @@ is_binary_factor <- function(binaryee_factor_column)
 
 
 
+#=================================================================
+# IS THE INPUT COLUMN MADE ONLY OF INTEGERSBUT NOT BINARY INTEGERS, TAKES A DATACOLUMDMN, RETUNS TRUE OR FALSE
+#=================================================================
+is_multicat_but_not_binary <- function(multicatee_column, number_of_levels = number_of_levels) 
+{
+        !is_binary_factor(multicatee_column) && is_any_kind_of_categorical(multicatee_column, number_of_levels = number_of_levels)
+}
+
+
 # NEW FUNCTION
 # CHECKS WHETHER THE INPUT VECTOR FALLS IS ANY CLASS THAT CN BE ;INTERPRETED AS CATEGORICAL
 is_any_kind_of_categorical <- function(checkee_column, number_of_levels = 5)

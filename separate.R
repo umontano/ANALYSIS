@@ -184,6 +184,50 @@ separate_responses_predictors_as_specified_in_variables_file  <- function(glmee_
         responses_predictors_datasets_list <- lapply(names_vectors, function(each_names_vector)glmee_dataset[names(glmee_dataset) %in% each_names_vector])
 }
 
+
+#RUN GENERL GLM ANALYSES BUT SPLTING THEDATASETS INTO TWO  _RESPONSES PEDICTORS_ AND INTO THREE _BINRY MULTICAT AND NUMERICAL
+# TAKES 1_DATASET AND 2_ A FILE CONTAING THE RESPONSES AND PREDICTOR SEPARATED BY A FOUR DASHES ----
+# RETURNS THE LSIT OF SIGNIFICANT PVALUES
+run_analyses_separating_into_responses_predictors_and_into_binary_multicat_numerical <- function(analysee_list)
+{
+        #responses_list  <- analysee_list[[1]]
+        resulting_list <- lapply(analysee_list, function(xxxx)
+         {
+        # DEFINE VARIABLES
+        binary_dependents <-xxxx[[1]][[1]]
+        dependents_multilevel <-xxxx[[1]][[2]]
+        dependents_numerical <-xxxx[[1]][[3]]
+        independents_multilevel <-xxxx[[2]][[2]]
+        joint_independents <- do.call(cbind, xxxx[[2]])
+        non_multi_independents <- do.call(cbind,  list(xxxx[[2]][[1]], xxxx[[2]][[3]]))
+        joint_dependents <- do.call(cbind, xxxx[[1]])
+        # SEND TO ANALYZE, AFTER CHECHING THAT DATASETS ARE NOT EMPTY
+        if(length(binary_dependents) < 1) banalyses <- NULL else 
+                banalyses <- send_responses_to_predictors_lm(responses_dataset = binary_dependents, predictors_dataset = joint_independents, threshold_significance = 0.05, categorical_flag = FALSE, logit_binomial_flag = TRUE)
+        if(length(dependents_numerical) < 1) manalyses <- NULL else 
+                nanalyses <- send_responses_to_predictors_lm(responses_dataset = dependents_numerical, predictors_dataset = joint_independents, threshold_significance = 0.05, categorical_flag = FALSE, logit_binomial_flag = FALSE)
+# MAKE JOINT FROM MULTICAT AND NUMERICAL PREDICTORS
+        if(length(independents_multilevel) < 1)
+        {
+                multibanalyses <- NULL
+                multinanalyses <- NULL
+        }
+        else 
+        {
+                independents_numerical <- xxxx[[2]][[3]]
+                joint_multicat_numerical_independents <- do.call(cbind, list(independents_multilevel, independents_numerical))
+                # INVERT MULTICATS _ THEY ARE USED AS PREDICTOR IN MULTICAT ANOVAS INSTEAD OF BEING THE RESPONSES
+                dependents_binary  <- binary_dependents
+                multibanalyses <- send_responses_to_predictors_lm(responses_dataset = dependents_binary, predictors_dataset = independents_multilevel, threshold_significance = 0.05, categorical_flag = FALSE, logit_binomial_flag = TRUE)
+                # INVERTED SECOND PART NONBINARIES
+                multinanalyses <- send_responses_to_predictors_lm(responses_dataset = joint_multicat_numerical_independents, predictors_dataset = independents_multilevel, threshold_significance = 0.05, categorical_flag = FALSE, logit_binomial_flag = TRUE)
+        }
+
+        list(banalyses = banalyses, multibanalyses = multibanalyses, multinanalyses = multinanalyses, nanalyses = nanalyses)
+        })
+}
+
+
 #=================================================================
 # GENERAL RUN ANALYSES, USING AUTOMATIC GLM MODEL SELECTION
 #================================================================

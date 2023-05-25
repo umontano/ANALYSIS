@@ -231,11 +231,17 @@ run_analyses_separating_into_responses_predictors_and_into_binary_multicat_numer
 #=================================================================
 # GENERAL RUN ANALYSES, USING AUTOMATIC GLM MODEL SELECTION
 #================================================================
-run_autoselected_glm_analyses <- function(glmee_dataset, number_of_levels = number_of_levels, threshold_significance = threshold_significance, variables_file = 'variables.txt')
+run_autoselected_glm_analyses <- function(..., number_of_levels = number_of_levels, threshold_significance = threshold_significance, variables_file = 'variables.txt')
 {
-        resp_pred <- separate_responses_predictors_as_specified_in_variables_file(glmee_dataset)
+        arguments_list <- list(...)
+        # DECISION ON NUMBER OF ATASETS.
+        # WITH MORE THAM DATASET FEED THEM DIRECTLY TO THE ANALYSIS FUNCTION.
+        if(length(arguments_list) > 1) resp_pred <- list(responses = ..1, predictors = ..2)
+        # WITH ON DATASETS SEND TO THE SEPARATING FUNCTION AND THE RETURNED RESULTS IS THEN SEND TO THE ANALYSIS FUNCTION
+        else resp_pred <- separate_responses_predictors_as_specified_in_variables_file(..1)
+
+        # SEND THE LIST OF DATASETS TO THE ANALYZE FUNCTION
         significants_list  <- analyze_many_response_many_predictors_using_automatic_lm_selector(resp_pred[[1]], resp_pred[[2]], number_of_levels = number_of_levels, threshold_significance = threshold_significance)
         if(require('yaml')) write_yaml(significants_list, 'xSIGNIFICAT_RESULTS.yaml')
         significants_list
 }
-

@@ -228,6 +228,17 @@ run_analyses_separating_into_responses_predictors_and_into_binary_multicat_numer
 }
 
 
+
+# SAVE THE LIST OF SIGNIFICANT RESULT  TO A YAML FILE
+save_list_to_yaml <- function(significants_list = significants_list, resp_pred = resp_pred, number_of_levels = number_of_levels, threshold_significance = threshold_significance, variables_file = 'variables.txt')
+{
+        # MAKE RESULTS FILE NAME
+        date_time <- format(Sys.time(), 'x%y%m%d_%Hh%Mm%Ss_')
+        yaml_file_name <- paste0('xSIGNIFICAT_RESULTS', '_deped_', names(resp_pred[[1]])[1], '_independ_', names(resp_pred[[2]])[1], '_specs_file_', variables_file, '_levels', number_of_levels, '_signif', threshold_significance,  date_time, '.yaml')
+        print(yaml_file_name)
+        if(require('yaml')) write_yaml(significants_list, yaml_file_name)
+}
+
 #=================================================================
 # GENERAL RUN ANALYSES, USING AUTOMATIC GLM MODEL SELECTION
 #================================================================
@@ -242,6 +253,6 @@ run_autoselected_glm_analyses <- function(..., number_of_levels = number_of_leve
 
         # SEND THE LIST OF DATASETS TO THE ANALYZE FUNCTION
         significants_list  <- analyze_many_response_many_predictors_using_automatic_lm_selector(resp_pred[[1]], resp_pred[[2]], number_of_levels = number_of_levels, threshold_significance = threshold_significance)
-        if(require('yaml')) write_yaml(significants_list, 'xSIGNIFICAT_RESULTS.yaml')
-        significants_list
+        save_list_to_yaml(significants_list = significants_list, resp_pred = resp_pred, number_of_levels = number_of_levels, threshold_significance = threshold_significance, variables_file = 'variables.txt')
+        return(significants_list)
 }

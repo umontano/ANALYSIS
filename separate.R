@@ -1,3 +1,14 @@
+packages_vector <- c('dplyr')
+load_or_install_packages <- function(loadee_package_name)
+{
+        if(!require(loadee_package_name))
+        {
+                install.packages(loadee_package_name)
+                library(loadee_package_name)
+        }
+}
+lapply(packages_vector, load_or_install_packages)
+
 #funs() was deprecated in dplyr 0.8.0.
 # Please use a list of either functions or lambdas:
 # Simple named list: list(mean = mean, median = median)
@@ -19,6 +30,23 @@ descriptives_grouped_by_first_column <- function(grouping_variable, descriptee_d
         return(summarized_statistics)
 }
 
+# MAPPED DESCRIPTIVES. FIRST ARGUMENT IS A DATASET WITH THE MANY GROUPIN VARIAVLES. SECOND ARGUMENT IS A DATASET WITH ALL THE VARIABLES TO BE GROUPED AND SUMMARIZED.
+# RETURNS A LIST OF AS MANY DESCRIBING DATASETS AS INPUTS IN THE FIRST ARGUMENT.
+describe_many_groupings_to_many_descrebees <- function(groupings_dataset, descriptee_dataset)
+{
+        date_time <- format(Sys.time(), 'x%y%m%d_%Hh%Mm%Ss_')
+        descriptions_file_name <- paste0('xDESCRIPTIONS_', date_time, '.yaml')
+        print(date_time)
+        print(descriptions_file_name)
+        descriptions_list <- sapply(names(groupings_dataset),function(each_grouping_column_name) aggregate(x = descriptee_dataset,
+                                                                                                           list(group = groupings_dataset[, each_grouping_column_name]),
+                                                                                                           FUN = 
+                                                                                                           function(x) c(mean = mean(x), sd = sd(x))), simplify = FALSE)
+        #descriptions_list <- sapply(groupings_dataset,function(each_grouping_column_name) aggregate(. ~ each_grouping_column_name, descriptee_dataset, function(x) c(mean = mean(x), sd = sd(x))), simplify = FALSE)
+        #descriptions_list <- sapply(groupings_dataset, descriptives_grouped_by_first_column, descriptee_dataset, simplify = FALSE)
+        if(require(yaml)) write_yaml(descriptions_list, descriptions_file_name)
+        return(descriptions_list)
+}
 
 
 

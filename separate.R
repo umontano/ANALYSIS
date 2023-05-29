@@ -1,4 +1,4 @@
-packages_vector <- c('dplyr')
+#packages_vector <- c('dplyr')
 load_or_install_packages <- function(loadee_package_name)
 {
         if(!require(loadee_package_name))
@@ -7,7 +7,7 @@ load_or_install_packages <- function(loadee_package_name)
                 library(loadee_package_name)
         }
 }
-lapply(packages_vector, load_or_install_packages)
+#lapply(packages_vector, load_or_install_packages)
 
 #funs() was deprecated in dplyr 0.8.0.
 # Please use a list of either functions or lambdas:

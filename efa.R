@@ -165,9 +165,7 @@ count_items_in_each_dimension <- function(countee_items_by_subdim, minimal_n_ite
 
     # MAKE TEXT SPECIICATION FOR LAAVAN CFA
     dims_names <- names(for_cfa_spec_items_above_minimal[- c('item')])
-    spec_lines <- lapply
-    (
-        dims_names, function(x)
+    spec_lines <- lapply(dims_names, function(x)
         {
             summands <- for_cfa_spec_items_above_minimal['item'][for_cfa_spec_items_above_minimal[x] ]
             summands <- paste(summands, sep = ' + ', collapse = ' + ')

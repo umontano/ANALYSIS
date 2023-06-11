@@ -154,7 +154,7 @@ lavaan_spec_from_na_marked_loadings_matrix <- function(for_cfa_spec_items_above_
         {
             summands <- item[for_cfa_spec_items_above_minimal[, x] ]
             summands <- paste(summands, sep = ' + ', collapse = ' + ')
-            paste0(x, ' ~= ', summands)
+            paste0(x, ' =~ ', summands)
         }
     )
     paste(spec_lines, collapse = '\n')

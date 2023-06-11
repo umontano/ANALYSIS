@@ -156,7 +156,10 @@ count_items_in_each_dimension <- function(countee_items_by_subdim, minimal_n_ite
 	selector_more_than_minimal <- sapply(subdims_names, function(subdimension) sum(!is.na(countee_items_by_subdim[, subdimension])) >= minimal_n_items)
 	rows_items_names <- dimnames(countee_items_by_subdim)[[1]]
 	selector_rows <- sapply(rows_items_names, function(each_row) sum(!is.na(countee_items_by_subdim[each_row,])) > 0)
-	for_cfa_spec_items_above_minimal <- countee_items_by_subdim[selector_rows, selector_more_than_minimal]
+	for_cfa_spec_items_above_minimal <- as.data.frame(countee_items_by_subdim[selector_rows, selector_more_than_minimal])
+    for_cfa_spec_items_above_minimal$item <- rownames(for_cfa_spec_items_above_minimal)
+    # REORDER ITEM COLUMN FIRST
+    for_cfa_spec_items_above_minimal <- for_cfa_spec_items_above_minimal[c('item', 1:length(for_cfa_spec_items_above_minimal) - 1)]
 	#JOIN AND NAME RESULTS
 	list(n_items_in_each_dim = n_items_in_each_dim, n_less_than_min = n_less_than_min, for_spec = for_cfa_spec_items_above_minimal)
 }

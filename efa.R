@@ -157,6 +157,7 @@ count_items_in_each_dimension <- function(countee_items_by_subdim, minimal_n_ite
 	rows_items_names <- dimnames(countee_items_by_subdim)[[1]]
 	selector_rows <- sapply(rows_items_names, function(each_row) sum(!is.na(countee_items_by_subdim[each_row,])) > 0)
 	for_cfa_spec_items_above_minimal <- as.data.frame(countee_items_by_subdim[selector_rows, selector_more_than_minimal])
+    for_cfa_spec_items_above_minimal[] <- !is.na(for_cfa_spec_items_above_minimal)
     for_cfa_spec_items_above_minimal$item <- rownames(for_cfa_spec_items_above_minimal)
     # REORDER ITEM COLUMN FIRST
     ll <- length(for_cfa_spec_items_above_minimal)

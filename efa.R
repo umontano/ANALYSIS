@@ -158,16 +158,14 @@ count_items_in_each_dimension <- function(countee_items_by_subdim, minimal_n_ite
 	selector_rows <- sapply(rows_items_names, function(each_row) sum(!is.na(countee_items_by_subdim[each_row,])) > 0)
 	for_cfa_spec_items_above_minimal <- as.data.frame(countee_items_by_subdim[selector_rows, selector_more_than_minimal])
     for_cfa_spec_items_above_minimal[] <- !is.na(for_cfa_spec_items_above_minimal)
-    for_cfa_spec_items_above_minimal$item <- rownames(for_cfa_spec_items_above_minimal)
     # REORDER ITEM COLUMN FIRST
-    ll <- length(for_cfa_spec_items_above_minimal)
-    for_cfa_spec_items_above_minimal <- for_cfa_spec_items_above_minimal[, c(ll, 1 : ll - 1)]
 
+    item <- rownames(for_cfa_spec_items_above_minimal)
     # MAKE TEXT SPECIICATION FOR LAAVAN CFA
-    dims_names <- names(for_cfa_spec_items_above_minimal[- c('item')])
+    dims_names <- names(for_cfa_spec_items_above_minimal)
     spec_lines <- lapply(dims_names, function(x)
         {
-            summands <- for_cfa_spec_items_above_minimal['item'][for_cfa_spec_items_above_minimal[x] ]
+            summands <- item[for_cfa_spec_items_above_minimal[, x] ]
             summands <- paste(summands, sep = ' + ', collapse = ' + ')
             paste0(x, ' ~= ', summands)
         }

@@ -159,7 +159,8 @@ count_items_in_each_dimension <- function(countee_items_by_subdim, minimal_n_ite
 	for_cfa_spec_items_above_minimal <- as.data.frame(countee_items_by_subdim[selector_rows, selector_more_than_minimal])
     for_cfa_spec_items_above_minimal$item <- rownames(for_cfa_spec_items_above_minimal)
     # REORDER ITEM COLUMN FIRST
-    for_cfa_spec_items_above_minimal <- for_cfa_spec_items_above_minimal[c('item', 1:length(for_cfa_spec_items_above_minimal) - 1)]
+    ll <- length(for_cfa_spec_items_above_minimal)
+    for_cfa_spec_items_above_minimal <- for_cfa_spec_items_above_minimal[, c(ll, 1 : ll - 1)]
 	#JOIN AND NAME RESULTS
 	list(n_items_in_each_dim = n_items_in_each_dim, n_less_than_min = n_less_than_min, for_spec = for_cfa_spec_items_above_minimal)
 }

@@ -162,6 +162,20 @@ count_items_in_each_dimension <- function(countee_items_by_subdim, minimal_n_ite
     # REORDER ITEM COLUMN FIRST
     ll <- length(for_cfa_spec_items_above_minimal)
     for_cfa_spec_items_above_minimal <- for_cfa_spec_items_above_minimal[, c(ll, 1 : ll - 1)]
+
+    # MAKE TEXT SPECIICATION FOR LAAVAN CFA
+    dims_names <- names(for_cfa_spec_items_above_minimal[- c('item')])
+    spec_lines <- lapply
+    (
+        dims_names, function(x)
+        {
+            summands <- for_cfa_spec_items_above_minimal['item'][for_cfa_spec_items_above_minimal[x] ]
+            summands <- paste(summands, sep = ' + ', collapse = ' + ')
+            paste0(x, ' ~= ', summands)
+        }
+    )
+    for_cfa_spec_items_above_minimal <- paste(spec_lines, collapse = '\n')
+
 	#JOIN AND NAME RESULTS
 	list(n_items_in_each_dim = n_items_in_each_dim, n_less_than_min = n_less_than_min, for_spec = for_cfa_spec_items_above_minimal)
 }

@@ -138,6 +138,28 @@ cronbachs_alpha_dims_items_list <- function(dims_items, dataset)
 
 
 
+#=================================================
+# MAKE THE LAVAAN CFA SPECIFICATION TEXT FROM AN INPUT LOADINGS MATRIX
+#=================================================
+lavaan_spec_from_na_marked_loadings_matrix <- function(for_cfa_spec_items_above_minimal = for_cfa_spec_items_above_minimal)
+{
+    # MAKE MATRIX BOOLEAN
+    for_cfa_spec_items_above_minimal[] <- !is.na(for_cfa_spec_items_above_minimal)
+
+    item <- rownames(for_cfa_spec_items_above_minimal)
+    # MAKE TEXT SPECIICATION FOR LAAVAN CFA
+
+    dims_names <- names(for_cfa_spec_items_above_minimal)
+    spec_lines <- lapply(dims_names, function(x)
+        {
+            summands <- item[for_cfa_spec_items_above_minimal[, x] ]
+            summands <- paste(summands, sep = ' + ', collapse = ' + ')
+            paste0(x, ' ~= ', summands)
+        }
+    )
+    paste(spec_lines, collapse = '\n')
+}
+
 
 #=================================================
 # TAKES A LOADINGS MATRIX AND COUNTS HOW MANY ITESMS ARE NOT NA IN EACH FACTOR
@@ -157,21 +179,8 @@ count_items_in_each_dimension <- function(countee_items_by_subdim, minimal_n_ite
 	rows_items_names <- dimnames(countee_items_by_subdim)[[1]]
 	selector_rows <- sapply(rows_items_names, function(each_row) sum(!is.na(countee_items_by_subdim[each_row,])) > 0)
 	for_cfa_spec_items_above_minimal <- as.data.frame(countee_items_by_subdim[selector_rows, selector_more_than_minimal])
-    for_cfa_spec_items_above_minimal[] <- !is.na(for_cfa_spec_items_above_minimal)
-    # REORDER ITEM COLUMN FIRST
-
-    item <- rownames(for_cfa_spec_items_above_minimal)
-    # MAKE TEXT SPECIICATION FOR LAAVAN CFA
-    dims_names <- names(for_cfa_spec_items_above_minimal)
-    spec_lines <- lapply(dims_names, function(x)
-        {
-            summands <- item[for_cfa_spec_items_above_minimal[, x] ]
-            summands <- paste(summands, sep = ' + ', collapse = ' + ')
-            paste0(x, ' ~= ', summands)
-        }
-    )
-    for_cfa_spec_items_above_minimal <- paste(spec_lines, collapse = '\n')
-
+    # MAKE LAVAAN SPEC BY CALLING THE FUNCTION
+    for_cfa_spec_items_above_minimal <- lavaan_spec_from_na_marked_loadings_matrix(for_cfa_spec_items_above_minimal)
 	#JOIN AND NAME RESULTS
 	list(n_items_in_each_dim = n_items_in_each_dim, n_less_than_min = n_less_than_min, for_spec = for_cfa_spec_items_above_minimal)
 }

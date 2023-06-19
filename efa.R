@@ -198,7 +198,7 @@ count_items_in_each_dimension <- function(countee_items_by_subdim, minimal_n_ite
 #================================================================
 # COMPUTES THE ALPHAS AND THE REST OF THE TALLIES , CONTS AND AND STATISTICS OF THE EFAS
 #================================================================
-final_tally_stats_efa_alphas <- function(fit_psych_fa = fit_psych_fa, minimal_n_items = minimal_n_items)
+final_tally_stats_efa_alphas <- function(fit_psych_fa = fit_psych_fa, minimal_n_items = minimal_n_items, unanswered_cleaned_dataset = unanswered_cleaned_dataset)
 {
         keepees_removees <- efa_items_to_keep_and_remove(fit_psych_fa)
 
@@ -217,7 +217,7 @@ final_tally_stats_efa_alphas <- function(fit_psych_fa = fit_psych_fa, minimal_n_
 	nprop_dims_results <- nproportions_from_dims_spec_lists(dims_spec_list = new_spec_lists, original_spec_list = separated_subdim)
 
 	#Cronbach's Alpha for each efa factor is computed and resturned as a list
-	cbqitemsalphas <- cronbachs_alpha_dims_items_list(new_spec_lists[ ], in_funct_notoomany)
+	cbqitemsalphas <- cronbachs_alpha_dims_items_list(new_spec_lists[ ], unanswered_cleaned_dataset)
 	print(cbqitemsalphas)
 
 	# JOIN AND NAME THE RESULTS
@@ -236,7 +236,7 @@ final_tally_stats_efa_alphas <- function(fit_psych_fa = fit_psych_fa, minimal_n_
 compute_efa_alpha <- function(nfactors = 15, dataset = imputed_notoo, minimal_n_items = 7)
 {
 	#remove too many unanswered questions and participants from df
-	in_funct_notoomany <- off20percent_dataset(15, 20, dataset)
+	unanswered_cleaned_dataset <- off20percent_dataset(15, 20, dataset)
 
 	#loadings_efa <- compute_efa_loadings(each_nfactors = nfactors, notoo) 
 	#numdims <- proportion_of_subdims_in_testing_list(noloadings_list_items)

@@ -243,6 +243,6 @@ compute_efa_alpha <- function(nfactors = 15, dataset = imputed_notoo, minimal_n_
 	#keepees_removees is a list which contains 
 	#1_ the ok items, 2_ the crossloaded items, 3_ the noloading items, and 4_ the matrix cut off at 0.3
 fit_psych_fa <- wls_promax_fa_fit_from_n_data(nfactors = nfactors, cleaned_dataset = dataset)
-        final_tally_stats_efa_alphas(fit_psych_fa, minimal_n_items minimal_n_items)
+        final_tally_stats_efa_alphas(fit_psych_fa, minimal_n_items = minimal_n_items)
 }
 

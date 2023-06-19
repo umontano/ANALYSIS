@@ -126,9 +126,13 @@ generate_new_spec_lists <- function(clean_matrix)
 #=========================================
 cronbachs_alpha_of_names_list <- function(alphaees_list, dataset)
 {
-	dfalphaee <- dataset[, alphaees_list]
+	dfalphaee <- dataset[, alphaees_list, drop = FALSE]
+        if(is.data.frame(dfalphaee) && length(dfalphaee) > 1) 
+        {
 	rep(print(strrep('I', 64)), 3)
 	return(psych::alpha(dfalphaee, na.rm = TRUE, check.keys = TRUE, warnings = FALSE)$total$std.alpha)
+        }
+        else return(NULL)
 }
 
 cronbachs_alpha_dims_items_list <- function(dims_items, dataset)

@@ -43,13 +43,20 @@ off20percent_dataset <- function(qunanswered_percentage = 20, punanswered_percen
 }
 
 
+#================================================================
+#MAKE PSYCH FA FIT FROM NUMBER OF FACTORS AND CLEANED DATASET
+#================================================================
+wls_promax_fa_fit_from_n_data <- function(nfactors = nfactors, cleaned_dataset = cleaned_dataset)
+{
+        psych::fa(cleaned_dataset, nfactors= nfactors, rotate='promax', fm='wls')
+}
+
 #=========================================
 #COMPUTE psych fa ITEMS TO BE REMOVED
 #=========================================
-efa_items_to_keep_and_remove <- function(nfactors = 5, cleaned_dataset = notoo)
+efa_items_to_keep_and_remove <- function(fit_psych_fa = fit_psych_fa)
 {
-  fit_psych_fa <- psych::fa(cleaned_dataset, nfactors= nfactors, rotate='promax', fm='wls')
-  psych::print.psych(fit_psych_fa, sort=TRUE)
+        psych::print.psych(fit_psych_fa, sort=TRUE)
   load_matrix <- fit_psych_fa$loadings
   load_matrix[abs(load_matrix) < 0.30] <- NA
   okloadings_list_items    <- unlist(sapply(row.names(load_matrix),function(x)if(sum(!is.na(load_matrix[x, ])) == 1) {print(x); return(x)}))
@@ -187,23 +194,13 @@ count_items_in_each_dimension <- function(countee_items_by_subdim, minimal_n_ite
 }
 
 
-#=========================================
-#=========================================
-# MAIN FUNCTIION
-# List psych efa and alphas
-# ALSO GENERATES THE LOADINGS MATRIX TO MAKE THE LAVAAN CFA SPECIFICATION
-#=========================================
-#=========================================
-compute_efa_alpha <- function(nfactors = 15, dataset = imputed_notoo)
-{
-	#remove too many unanswered questions and participants from df
-	in_funct_notoomany <- off20percent_dataset(15, 20, dataset)
 
-	#loadings_efa <- compute_efa_loadings(each_nfactors = nfactors, notoo) 
-	#numdims <- proportion_of_subdims_in_testing_list(noloadings_list_items)
-	#keepees_removees is a list which contains 
-	#1_ the ok items, 2_ the crossloaded items, 3_ the noloading items, and 4_ the matrix cut off at 0.3
-	keepees_removees <- efa_items_to_keep_and_remove(nfactors = nfactors, cleaned_dataset = in_funct_notoomany)
+#================================================================
+# COMPUTES THE ALPHAS AND THE REST OF THE TALLIES , CONTS AND AND STATISTICS OF THE EFAS
+#================================================================
+final_tally_stats_efa_alphas <- function(fit_psych_fa = fit_psych_fa, minimal_n_items = minimal_n_items)
+{
+        keepees_removees <- efa_items_to_keep_and_remove(fit_psych_fa)
 
 	#TALY of items in each subdimension and how many of those subdimensions has less than a minimal amount of items _seven as default
 	n_items_in_each_dim <- count_items_in_each_dimension(keepees_removees[[4]], minimal_n_items = 7)
@@ -228,3 +225,24 @@ compute_efa_alpha <- function(nfactors = 15, dataset = imputed_notoo)
 	names(efa_alpha_results) <- c('for_spec', 'ok_cross_0_matrix', 'items_in_dim', 'percents', 'alphas')
 	efa_alpha_results
 }
+
+#=========================================
+#=========================================
+# MAIN FUNCTIION
+# List psych efa and alphas
+# ALSO GENERATES THE LOADINGS MATRIX TO MAKE THE LAVAAN CFA SPECIFICATION
+#=========================================
+#=========================================
+compute_efa_alpha <- function(nfactors = 15, dataset = imputed_notoo, minimal_n_items = 7)
+{
+	#remove too many unanswered questions and participants from df
+	in_funct_notoomany <- off20percent_dataset(15, 20, dataset)
+
+	#loadings_efa <- compute_efa_loadings(each_nfactors = nfactors, notoo) 
+	#numdims <- proportion_of_subdims_in_testing_list(noloadings_list_items)
+	#keepees_removees is a list which contains 
+	#1_ the ok items, 2_ the crossloaded items, 3_ the noloading items, and 4_ the matrix cut off at 0.3
+fit_psych_fa <- wls_promax_fa_fit_from_n_data(nfactors = nfactors, cleaned_dataset = dataset)
+        final_tally_stats_efa_alphas(fit_psych_fa, minimal_n_items minimal_n_items)
+}
+

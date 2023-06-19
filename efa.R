@@ -132,7 +132,7 @@ cronbachs_alpha_of_names_list <- function(alphaees_list, dataset)
 	rep(print(strrep('I', 64)), 3)
 	return(psych::alpha(dfalphaee, na.rm = TRUE, check.keys = TRUE, warnings = FALSE)$total$std.alpha)
         }
-        else return(NULL)
+        else return(c(no_alpha = 0))
 }
 
 cronbachs_alpha_dims_items_list <- function(dims_items, dataset)

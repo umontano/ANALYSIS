@@ -70,7 +70,7 @@ boxplots_multinum_multicat_mapped <- function(boxplotee_numerical_df=boxplotee_n
 ######################################
 ######################################
 ######################################
-bars_1cat_multicat_ggplot <- function(single_cat_variable, categorical_groupings_vars_df, arg_position = 'dodge', name_single_cat=names(single_cat_variable), names_categorical_vars=names(categorical_groupings_vars_df))
+bars_1cat_multicat_ggplot <- function(single_cat_variable, categorical_groupings_vars_df, arg_position = 'fill', name_single_cat=names(single_cat_variable), names_categorical_vars=names(categorical_groupings_vars_df))
 {
 library('ggbeeswarm')
 library('ggplot2')
@@ -128,7 +128,7 @@ merged_dataset <- data.frame(single_cat_variable, categorical_groupings_vars_df)
 
 bars_multicat_multicat_mapped <- function(baree_levels_categories=baree_levels_categories, 
 												baree_facetting_categories=baree_facetting_categories,
-												arg_position = 'dodge',
+												arg_position = 'fill',
                                                       names_levels_cats = names(baree_levels_categories),
                                                       names_facets_cats = names(baree_facetting_categories))
 {

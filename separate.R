@@ -73,9 +73,20 @@ string_labels_from_variable_symbols <- function(var)
 # CHECK FOR MEMBERSHIP IN  A ZERO_BASED INTEGER SET
 # TAKES AS INPUT A COLUMN TO CHECK _A VECTOR_ AND THE HIGHEST NUMBER THAT BE CONSIDERED AS CATEGORIC _INTEGER_
 # ITS AIM IS TO HELP TO SELECT COLUMS IN A DATASET THAT ENCODE CATEGORICAL VARIABLES USING INTEGERS
-has_only_n_integers <- function(checkee_column, number_of_levels = 5){all(checkee_column[!is.na(checkee_column)] %in% 0 : number_of_levels)}
+
+                                                                                                           has_only_n_integers <- function(checkee_column, number_of_levels = 5){all(checkee_column[!is.na(checkee_column)] %in% 0 : number_of_levels)}
 # THIS IS A VARIATION OF THE ABOVE FUNCTION _ IT COMPUTES THE NUMBER OF LEVLS DIRECTLY INSTEAD OF CHECKING FOR MEMBERSHIP IN A ZERO_BASED INTEGER SET
-has_n_leves_or_less <- function(checkee_column, number_of_levels = 5)length(levels(as.factor(checkee_column))) <= number_of_levels
+#revised version
+has_only_n_integers <- function(checkee_column, number_of_levels = 5)
+{
+  unique_values <- unique(checkee_column)
+  all_integers <- all(unique_values %% 1 == 0)  # Check if all unique values are integers
+  in_range <- all(unique_values >= 0 & unique_values <= (number_of_levels - 1))  # Check if all unique values are within the specified range
+  return(all_integers & in_range)
+}
+ #oldversion failure                                                                                                          
+#has_n_leves_or_less <- function(checkee_column, number_of_levels = 5)length(levels(as.factor(checkee_column))) <= number_of_levels
+
 #UNUSED OLD
 unused_old_has_only_n_integers <- function(checkee_column, number_of_levels = 5)
 {

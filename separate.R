@@ -78,11 +78,12 @@ string_labels_from_variable_symbols <- function(var)
 #revised version
 has_only_n_integers <- function(checkee_column, number_of_levels = 5)
 {
-  unique_values <- unique(checkee_column)
-  all_integers <- all(unique_values %% 1 == 0)  # Check if all unique values are integers
-  in_range <- all(unique_values >= 0 & unique_values <= (number_of_levels - 1))  # Check if all unique values are within the specified range
+  unique_values <- as.numeric(levels(checkee_column))
+  all_integers <- all(!is.na(unique_values) & unique_values %% 1 == 0)  # Check if all unique values are integers
+  in_range <- all(!is.na(unique_values) & unique_values >= 0 & unique_values <= (number_of_levels - 1))  # Check if all unique values are within the specified range
   return(all_integers & in_range)
 }
+
  #oldversion failure                                                                                                          
 #has_n_leves_or_less <- function(checkee_column, number_of_levels = 5)length(levels(as.factor(checkee_column))) <= number_of_levels
 

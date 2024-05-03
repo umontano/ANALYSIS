@@ -281,7 +281,7 @@ save_list_to_yaml <- function(significants_list = significants_list, resp_pred =
 #=================================================================
 # GENERAL RUN ANALYSES, USING AUTOMATIC GLM MODEL SELECTION
 #================================================================
-run_autoselected_glm_analyses <- function(..., number_of_levels = number_of_levels, threshold_significance = threshold_significance, variables_file = 'variables.txt')
+run_autoselected_glm_analyses <- function(..., number_of_levels = 5, threshold_significance = 0.05, variables_file = 'variables.txt')
 {
         arguments_list <- list(...)
         # DECISION ON NUMBER OF ATASETS.

@@ -125,7 +125,7 @@ is_multicat_but_not_binary <- function(multicatee_column, number_of_levels = num
 # NEW FUNCTION
 # CHECKS WHETHER THE INPUT VECTOR FALLS IS ANY CLASS THAT CN BE ;INTERPRETED AS CATEGORICAL
 is_any_kind_of_categorical <- function(checkee_column, number_of_levels = 5)
-{has_only_n_integers(checkee_column, number_of_levels = number_of_levels) || is.factor(checkee_column) || is.character(checkee_column)}
+{has_only_n_integers(checkee_column, number_of_levels) || is.factor(checkee_column) || is.character(checkee_column)}
 
 
 # SEPARATES A DATASET INTO CATEGORICAL AND NUMERIC VARIABLES

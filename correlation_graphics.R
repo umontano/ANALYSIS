@@ -50,8 +50,8 @@ find_significant_correlations_from_rows_and_cols_datasets <- function(rows_datas
         #for(eachcol in cols) {
             #for(eachrow in rows) {
 			if(
-                !is.na(cor_test_mat[eachrow , eachcol]) &&
-                eachrow != eachcol &&
+                !is.na(cor_test_mat[eachrow , eachcol]) &
+                eachrow != eachcol &
                 cor_test_mat[eachrow , eachcol] < sign
                 ) {
                     pairs_list[[ length(pairs_list) +1 ]] <<- c(eachrow, eachcol);

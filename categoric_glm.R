@@ -117,7 +117,7 @@ merged_categorical_and_torrance_totals <- function(columns_dataset, categorical_
 }
 
 
-merged_lm_responses_to_predictors <- function(lmee_responses, lmee_categoricals, responses_names = names(lmee_responses), categoricals_names = names(lmee_categoricals), threshold_significance = 0.05, categorical_flag = FALSE)
+merged_lm_responses_to_predictors <- function(lmee_responses, lmee_categoricals, responses_names = names(lmee_responses), categoricals_names = names(lmee_categoricals), threshold_significance = 0.05, categorical_flag = FALSE, side = 1, cex = 1.0, pch = 1.0, alpha = 2/5, size = 1.7)
 {
 tttt <- merge(add_id_column_numero(lmee_responses), add_id_column_numero(lmee_categoricals), by = 'numero')
 cats <- tttt[, names(lmee_categoricals)]
@@ -129,7 +129,7 @@ if(length(results_list) > 0)
 	print(results_list)
 
 	pairs_list <- find_list_significant_differences_in_multi_lm(results_list)
-	anova_graphs_list <- anova_graphs_from_lm_pairs_list(tttt, pairs_list, threshold_significance = threshold_significance)
+	anova_graphs_list <- anova_graphs_from_lm_pairs_list(tttt, pairs_list, threshold_significance = threshold_significance, side=side, cex=cex, pch=pch, alpha=alpha, size=size)
 			#Show a single graph from the list of anova graphs
 			#NOTE: marrangeGrobs does not work with these anova plots, find the replacement in stackoverflow.
 			library('gridExtra')
@@ -176,11 +176,11 @@ find_list_significant_differences_in_multi_lm <- function(pairee_list)
 #================================================================
 #ANOVA from pairs list
 #================================================================
-anova_graphs_from_lm_pairs_list <- function(complete_dataset, lm_pairs_list, threshold_significance = 0.05)
+anova_graphs_from_lm_pairs_list <- function(complete_dataset, lm_pairs_list, threshold_significance = 0.05, side = 1, cex = 1.0, pch = 1.0, alpha = 2/5, size = 1.7)
 {
 	anova_graphs_list <- lapply(lm_pairs_list, 
 		function(x)
-			one_way_anova_graph(complete_dataset, x[1], x[2], threshold_significance = threshold_significance)
+			one_way_anova_graph(complete_dataset, x[1], x[2], threshold_significance = threshold_significance, side=side, cex=cex, pch=pch, alpha=alpha, size=size)
 			)
 	return(anova_graphs_list)
 }
@@ -238,28 +238,23 @@ return(gganova)
   
 
 #================================================================
-one_way_anova_graph <- function(complete_dataset, response_column, grouping_column1, threshold_significance = 0.05, printing_flag = TRUE)
+one_way_anova_graph <- function(complete_dataset, response_column, grouping_column1, threshold_significance = 0.05, printing_flag = TRUE, side = 1, cex = 1.0, pch = 1.0, alpha = 2/5, size = 1.7)
 {
 complete_dataset[,grouping_column1] <- as.factor(complete_dataset[, grouping_column1])
 #Summarize the original data using grouping_column1 type and planting grouping_column2 as grouping variables.
-
 library(dplyr)
-#complete_dataset <- iris
-#grouping_column1 <- 'Species'
-#response_column <- 'Sepal.Length'
 summarized_stats <- complete_dataset %>%
   group_by(!! as.symbol(grouping_column1)) %>%
   summarise(mean = mean(!! as.symbol(response_column)), sd = sd(get(response_column)), num = n())
 #summarized_stats
 
-
-
-library(ggplot2)
 library(ggbeeswarm)
 #Make graph
 gganova <- ggplot(complete_dataset, aes(get(grouping_column1), get(response_column), col = get(grouping_column1))) +
   #geom_point(cex = 1.5, pch = 1.0, position = position_jitter(w = 0.05, h = 0)) +
-  geom_beeswarm(cex = 0.5, alpha = 2/5, size = 0.5) +
+  #geom_beeswarm(side = 1, cex = 1.0, pch = 1.0, alpha = 2/5, size = 1.7) +
+  geom_beeswarm(side=side, cex=cex, pch=pch, alpha=alpha, size=size) +
+  #geom_point(cex = 1.5, pch = 1.0,position = position_jitter(w = 0.02, h = 0)) +
 #Add the means and standard errors to the graph
   stat_summary(fun.data = 'mean_se', geom = 'errorbar', width = 0.2) +
   stat_summary(fun.data = 'mean_se', geom = 'pointrange') +
